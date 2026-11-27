@@ -57,7 +57,14 @@ const NEGOCIO = {
   textoCita: "Para técnica de color separamos tu turno. Elige el servicio y la hora, se abre WhatsApp con tu mensaje listo y te confirmamos.",
 
   // Sin reseñas copiadas: se muestra la calificación real con botón a Google. Para poner reseñas: { autor, texto, estrellas: 5, ejemplo: false }
-  resenas: [],
+  resenas: [
+    { autor: "Nidelky F.", fecha: "Google", estrellas: 5, ejemplo: false,
+      texto: "Excelente experiencia en Yaelisa Salón. Desde que llegué recibí una atención cálida, amable y muy profesional. Todo el equipo se preocupa por brindar un servicio de calidad y hacer que cada cliente se sienta cómoda y bien atendida. El ambiente es agradable y los resultados siempre superan mis expectativas. Sin duda, es un salón que recomiendo al 100 %. ❤️👏🥇" },
+    { autor: "Ana T. A.", fecha: "Google", estrellas: 5, ejemplo: false,
+      texto: "Una experiencia espectacular, ir a este salón es saber que tu cabellera están en las manos correctas, más el mejor servicio. Desde su propietaria con sus especialidades sobre todo la de colorista, las que peinan... que a confianza se pueden peinar con cualquiera a ojos cerrados, las shampoonier, área de uñas, y que no quede el área de recepción o caja. Precios justos y sobre todo saldrás complacida. El mejor salón de Santo Domingo Este. Yaelisa Salón💇🏽‍♀️" },
+    { autor: "Seily N.", fecha: "Google", estrellas: 5, ejemplo: false,
+      texto: "Excelente servicio, excelente ambiente laboral, desde que se entra en la puerta se siente una buena vibra desde las recepcionistas, las shampoonier, las estilistas, manicuristas y que no de quede el maquillador estrella, me siento en mi otra casa, tomo el momento para relajarme y qué bien me hacen sentir, 1000 x 1000 recomendado !!" }
+  ],
 
   // Fotos sacadas de su Instagram, solo para la demo
   galeria: ["foto1.jpg", "foto2.jpg"]
@@ -77,6 +84,7 @@ const NEGOCIO = {
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 html{scroll-behavior:smooth}
+section{scroll-margin-top:80px}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "DM Sans",system-ui,sans-serif;overflow-x:clip}
 h1,h2,h3{font-family:"DM Serif Display",Georgia,serif;font-weight:400;line-height:1.05;letter-spacing:-.01em;margin:0}
 h2{font-size:clamp(30px,4.5vw,44px);margin-bottom:.4em}
@@ -277,10 +285,11 @@ footer{text-align:center;font-size:14px;color:var(--soft);padding:28px 16px calc
     + labels.slice(Math.min(N.galeria.length,4)).map((l,i) => `<div class="ph" style="background:linear-gradient(160deg,${tones[i]},color-mix(in srgb,${tones[i]} 55%,#000))">${l} · foto de muestra</div>`).join('');
 
   const verResenas = N.mapaLink || ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(N.mapaBusqueda));
-  if (!N.resenas.length) { const r = document.getElementById('revs'); r.style.display = 'block';
-    r.innerHTML = `<div class="gbox"><div class="big">${esc(N.rating)}</div><div><div class="st">${stars(5)}</div><p>${esc(N.totalResenas)} reseñas en Google</p></div><a class="btn main" href="${esc(verResenas)}" target="_blank" rel="noopener">Ver reseñas en Google</a></div>`; }
-  else document.getElementById('revs').innerHTML = N.resenas.map(r =>
-    `<figure class="rev" style="margin:0">${r.ejemplo?'<span class="tag">Ejemplo</span>':''}<div class="st">${stars(r.estrellas||5)}</div><q>${esc(r.texto)}</q><figcaption class="a">${esc(r.autor)}</figcaption></figure>`).join('');
+  const gbox = `<div class="gbox"><div class="big">${esc(N.rating)}</div><div><div class="st">${stars(5)}</div><p>${esc(N.totalResenas)} reseñas en Google</p></div><a class="btn main" href="${esc(verResenas)}" target="_blank" rel="noopener">Ver reseñas en Google</a></div>`;
+  const cards = N.resenas.map(r =>
+    `<figure class="rev" style="margin:0">${r.ejemplo?'<span class="tag">Ejemplo</span>':''}<div class="st">${stars(r.estrellas||5)}</div><q>${esc(r.texto)}</q><figcaption class="a">${esc(r.autor)}${r.fecha?` <span style="font-weight:400;color:var(--soft)">· ${esc(r.fecha)}</span>`:''}</figcaption></figure>`).join('');
+  const rv = document.getElementById('revs'); rv.style.display = 'block';
+  rv.innerHTML = gbox + (cards ? `<div class="revs" style="margin-top:20px">${cards}</div>` : '');
 
   const dias = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
   const hoy = dias[new Date().getDay()];

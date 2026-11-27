@@ -89,6 +89,7 @@ const NEGOCIO = {
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 html{scroll-behavior:smooth}
+section{scroll-margin-top:80px}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "DM Sans",system-ui,sans-serif;overflow-x:clip}
 h1,h2,h3{font-family:"DM Serif Display",Georgia,serif;font-weight:400;line-height:1.05;letter-spacing:-.01em;margin:0}
 h2{font-size:clamp(30px,4.5vw,44px);margin-bottom:.4em}
@@ -289,10 +290,11 @@ footer{text-align:center;font-size:14px;color:var(--soft);padding:28px 16px calc
     + labels.slice(Math.min(N.galeria.length,4)).map((l,i) => `<div class="ph" style="background:linear-gradient(160deg,${tones[i]},color-mix(in srgb,${tones[i]} 55%,#000))">${l} · foto de muestra</div>`).join('');
 
   const verResenas = N.mapaLink || ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(N.mapaBusqueda));
-  if (!N.resenas.length) { const r = document.getElementById('revs'); r.style.display = 'block';
-    r.innerHTML = `<div class="gbox"><div class="big">${esc(N.rating)}</div><div><div class="st">${stars(5)}</div><p>${esc(N.totalResenas)} reseñas en Google</p></div><a class="btn main" href="${esc(verResenas)}" target="_blank" rel="noopener">Ver reseñas en Google</a></div>`; }
-  else document.getElementById('revs').innerHTML = N.resenas.map(r =>
-    `<figure class="rev" style="margin:0">${r.ejemplo?'<span class="tag">Ejemplo</span>':''}<div class="st">${stars(r.estrellas||5)}</div><q>${esc(r.texto)}</q><figcaption class="a">${esc(r.autor)}</figcaption></figure>`).join('');
+  const gbox = `<div class="gbox"><div class="big">${esc(N.rating)}</div><div><div class="st">${stars(5)}</div><p>${esc(N.totalResenas)} reseñas en Google</p></div><a class="btn main" href="${esc(verResenas)}" target="_blank" rel="noopener">Ver reseñas en Google</a></div>`;
+  const cards = N.resenas.map(r =>
+    `<figure class="rev" style="margin:0">${r.ejemplo?'<span class="tag">Ejemplo</span>':''}<div class="st">${stars(r.estrellas||5)}</div><q>${esc(r.texto)}</q><figcaption class="a">${esc(r.autor)}${r.fecha?` <span style="font-weight:400;color:var(--soft)">· ${esc(r.fecha)}</span>`:''}</figcaption></figure>`).join('');
+  const rv = document.getElementById('revs'); rv.style.display = 'block';
+  rv.innerHTML = gbox + (cards ? `<div class="revs" style="margin-top:20px">${cards}</div>` : '');
 
   const dias = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
   const hoy = dias[new Date().getDay()];
