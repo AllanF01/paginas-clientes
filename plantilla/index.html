@@ -20,7 +20,7 @@ const NEGOCIO = {
   instagram: "",                                           // ej: "salondemo" (sin @). Vacío = se oculta
   mapaBusqueda: "Santo Domingo Este, República Dominicana",// texto que se busca en Google Maps
   mapaLink: "",  // link de Google Maps del negocio (botón Cómo llegar)
-  rating: "4.8", totalResenas: "227",
+  rating: "4.8", totalResenas: "227",   // vacío = se oculta la calificación
   logo: "",            // ej: "logo.png" en la misma carpeta. Vacío = solo el nombre
   logoConNombre: false, // true si el logo ya trae el nombre escrito (oculta el texto)
   color: "#c2185b",    // color principal de la marca
@@ -88,6 +88,7 @@ const NEGOCIO = {
 :root{color-scheme:light dark;--bg:light-dark(#fff4f1,#1c0d12);--card:light-dark(#ffffff,#2a141b);--ink:light-dark(#2b0f17,#fbe9ec);--soft:light-dark(#6e4650,#d9b3bc);--fu:light-dark(#c2185b,#ff5c97);--fu2:light-dark(#fbd3e1,#4a1a2c);--gold:light-dark(#b8892f,#e6bf6a);--line:light-dark(#efd6dc,#43242e);--wa:#1f9d55}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
+[hidden]{display:none!important}
 html{scroll-behavior:smooth}
 section{scroll-margin-top:80px}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "DM Sans",system-ui,sans-serif;overflow-x:clip}
@@ -181,7 +182,7 @@ footer{text-align:center;font-size:14px;color:var(--soft);padding:28px 16px calc
     <div class="kind"><span data-f="tipo"></span> en <span data-f="ciudad"></span><span class="exp" id="exp"></span></div>
     <h1 data-f="nombre"></h1>
     <p class="lead" data-f="frase"></p>
-    <div class="stars"><span class="st" id="st"></span><span><span data-f="rating"></span> en Google · <span data-f="totalResenas"></span> reseñas</span></div>
+    <div class="stars" id="pill"><span class="st" id="st"></span><span><span data-f="rating"></span> en Google · <span data-f="totalResenas"></span> reseñas</span></div>
     <div class="cta"><a class="btn main" href="#cita">Reservar cita</a><a class="btn ghost" href="#servicios">Ver precios</a></div>
   </div>
   <svg class="mirror" viewBox="0 0 400 450" aria-hidden="true">
@@ -274,6 +275,7 @@ footer{text-align:center;font-size:14px;color:var(--soft);padding:28px 16px calc
   if (N.color) document.documentElement.style.setProperty('--fu', N.color);
   if (N.logo) { const l = document.getElementById('logo'); l.src = N.logo; l.alt = N.nombre; l.hidden = false; if (N.logoConNombre) l.nextElementSibling.hidden = true; }
   document.getElementById('st').innerHTML = stars(5);
+  if (!N.rating) document.getElementById('pill').hidden = true;
   if (N.experiencia) document.getElementById('exp').textContent = '· ' + N.experiencia;
   if (N.promo && N.promo.titulo) document.getElementById('promo').hidden = false;
   if (N.botonProblema && N.botonProblema.texto) { const b = document.getElementById('btn-prob'); b.textContent = N.botonProblema.texto; b.href = wa(N.botonProblema.mensaje); b.hidden = false; }
@@ -285,12 +287,12 @@ footer{text-align:center;font-size:14px;color:var(--soft);padding:28px 16px calc
     (s.precio ? `<span class="p">${esc(s.precio)}</span>` : `<span class="p c">Consultar</span>`) + `</div>`).join('');
 
   const tones = ['var(--fu)','#7a0f3a','var(--gold)','#e2779f'];
-  const labels = ['Color','Peinado','Uñas','Cejas'];
+  const labels = N.etiquetasGaleria || ['Color','Peinado','Uñas','Cejas'];
   document.getElementById('gal').innerHTML = N.galeria.slice(0,8).map((u,i) => `<img src="${esc(u)}" alt="Trabajo ${i+1} de ${esc(N.nombre)}" loading="lazy">`).join('')
     + labels.slice(Math.min(N.galeria.length,4)).map((l,i) => `<div class="ph" style="background:linear-gradient(160deg,${tones[i]},color-mix(in srgb,${tones[i]} 55%,#000))">${l} · foto de muestra</div>`).join('');
 
   const verResenas = N.mapaLink || ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(N.mapaBusqueda));
-  const gbox = `<div class="gbox"><div class="big">${esc(N.rating)}</div><div><div class="st">${stars(5)}</div><p>${esc(N.totalResenas)} reseñas en Google</p></div><a class="btn main" href="${esc(verResenas)}" target="_blank" rel="noopener">Ver reseñas en Google</a></div>`;
+  const gbox = `<div class="gbox">${N.rating?`<div class="big">${esc(N.rating)}</div><div><div class="st">${stars(5)}</div><p>${esc(N.totalResenas)} reseñas en Google</p></div>`:`<div><p>Lee lo que dicen nuestras clientas en Google.</p></div>`}<a class="btn main" href="${esc(verResenas)}" target="_blank" rel="noopener">Ver reseñas en Google</a></div>`;
   const cards = N.resenas.map(r =>
     `<figure class="rev" style="margin:0">${r.ejemplo?'<span class="tag">Ejemplo</span>':''}<div class="st">${stars(r.estrellas||5)}</div><q>${esc(r.texto)}</q><figcaption class="a">${esc(r.autor)}${r.fecha?` <span style="font-weight:400;color:var(--soft)">· ${esc(r.fecha)}</span>`:''}</figcaption></figure>`).join('');
   const rv = document.getElementById('revs'); rv.style.display = 'block';
