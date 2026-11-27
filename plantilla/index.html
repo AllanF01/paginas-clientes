@@ -64,6 +64,7 @@ const NEGOCIO = {
   horasCita: ["8:00 AM","9:00 AM","10:00 AM","11:00 AM","12:00 PM","2:00 PM","3:00 PM","4:00 PM","5:00 PM"],
 
   // ejemplo:true muestra una etiqueta "Ejemplo". Pon ejemplo:false SOLO con reseñas copiadas de Google.
+  // resenas: [] (vacío) muestra el bloque con la calificación y un botón "Ver reseñas en Google".
   resenas: [
     { autor: "Nombre de clienta", texto: "Pega aquí una reseña real de Google Maps, tal como la escribió la clienta.", estrellas: 5, ejemplo: true },
     { autor: "Nombre de clienta", texto: "Otra reseña real: mejor una que hable del trato, el resultado o la puntualidad.", estrellas: 5, ejemplo: true },
@@ -141,6 +142,10 @@ a{color:inherit}
 .rev .st{margin-bottom:2px}
 .rev q{display:block;font-size:17px;margin:10px 0 14px;quotes:"“" "”"}
 .rev .a{font-weight:700;font-size:15px}
+.gbox{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px 32px;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:24px;padding:28px}
+.gbox .big{font:400 clamp(56px,8vw,88px)/1 "DM Serif Display",serif;color:var(--fu)}
+.gbox .star{width:26px;height:26px}
+.gbox p{margin:6px 0 0;color:var(--soft);font-size:17px}
 .tag{position:absolute;top:14px;right:14px;font-size:13px;background:var(--fu2);color:var(--ink);padding:2px 10px;border-radius:999px}
 .book .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:start}
 .slip{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:26px;display:grid;gap:14px}
@@ -161,7 +166,7 @@ footer{text-align:center;font-size:14px;color:var(--soft);padding:28px 16px calc
 .wa svg{width:34px;height:34px;fill:#fff}
 @media(prefers-reduced-motion:no-preference){.wa{animation:pop 2.4s ease-in-out 1.5s 2}@keyframes pop{50%{transform:scale(1.12)}}}
 @media(max-width:860px){.hero .wrap,.promise .wrap,.book .wrap,.contact .wrap{grid-template-columns:minmax(0,1fr)}.mirror{max-width:340px;order:2}.hero .txt{display:contents}.hero h1,.hero .kind,.hero .stars,.hero .lead{order:1}.hero .cta{order:3}.svc{grid-template-columns:minmax(0,1fr)}.gal{grid-template-columns:repeat(2,minmax(0,1fr))}.revs{grid-template-columns:minmax(0,1fr)}}
-@media(max-width:600px){.promo{grid-template-columns:minmax(0,1fr)}.nav nav{display:none}.hero .wrap{gap:18px}.lead{margin:6px 0}.stars{margin:0;justify-self:start}.cta .btn{flex:1}}
+@media(max-width:600px){.promo{grid-template-columns:minmax(0,1fr)}.gbox{grid-template-columns:auto minmax(0,1fr)}.gbox .btn{grid-column:1/-1}.nav nav{display:none}.hero .wrap{gap:18px}.lead{margin:6px 0}.stars{margin:0;justify-self:start}.cta .btn{flex:1}}
 </style>
 </head>
 <body>
@@ -283,7 +288,10 @@ footer{text-align:center;font-size:14px;color:var(--soft);padding:28px 16px calc
   document.getElementById('gal').innerHTML = N.galeria.slice(0,8).map((u,i) => `<img src="${esc(u)}" alt="Trabajo ${i+1} de ${esc(N.nombre)}" loading="lazy">`).join('')
     + labels.slice(Math.min(N.galeria.length,4)).map((l,i) => `<div class="ph" style="background:linear-gradient(160deg,${tones[i]},color-mix(in srgb,${tones[i]} 55%,#000))">${l} · foto de muestra</div>`).join('');
 
-  document.getElementById('revs').innerHTML = N.resenas.map(r =>
+  const verResenas = N.mapaLink || ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(N.mapaBusqueda));
+  if (!N.resenas.length) { const r = document.getElementById('revs'); r.style.display = 'block';
+    r.innerHTML = `<div class="gbox"><div class="big">${esc(N.rating)}</div><div><div class="st">${stars(5)}</div><p>${esc(N.totalResenas)} reseñas en Google</p></div><a class="btn main" href="${esc(verResenas)}" target="_blank" rel="noopener">Ver reseñas en Google</a></div>`; }
+  else document.getElementById('revs').innerHTML = N.resenas.map(r =>
     `<figure class="rev" style="margin:0">${r.ejemplo?'<span class="tag">Ejemplo</span>':''}<div class="st">${stars(r.estrellas||5)}</div><q>${esc(r.texto)}</q><figcaption class="a">${esc(r.autor)}</figcaption></figure>`).join('');
 
   const dias = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
