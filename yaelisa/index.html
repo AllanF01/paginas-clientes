@@ -21,7 +21,8 @@ const NEGOCIO = {
   mapaBusqueda: "Salón YaElisa, Autopista de San Isidro, Santo Domingo Este",
   mapaLink: "https://www.google.com/maps/place/Sal%C3%B3n+YaElisa/data=!4m2!3m1!1s0x8eaf87655616d7a1:0x795edcd7ee7b4611",
   rating: "4.8", totalResenas: "227",
-  logo: "logo.png",
+  logo: "logo-texto.png",
+  logoConNombre: true, // el logo ya trae el nombre: oculta el texto al lado
   color: "#9c7a2c",
   experiencia: "18 años de experiencia",
   mensajeWhatsApp: "¡Hola Yaelisa Salón! Vi su página y quiero información.",
@@ -108,7 +109,10 @@ a{color:inherit}
 .promise h2{color:#fff;margin:0}
 .promise p{font-size:18px;margin:0 0 16px}
 .promise .btn{background:#fff;color:var(--fu);border-color:#fff}
-.logo{width:40px;height:40px;border-radius:50%;vertical-align:middle;margin-right:10px;border:1px solid var(--line);background:#fff}
+.logo{height:54px;width:auto;max-width:180px;display:block}
+.brand{display:flex;align-items:center;gap:10px}
+.star{width:18px;height:18px;fill:var(--gold);display:block}
+.st{display:inline-flex;gap:2px}
 .exp{display:inline-block;margin-left:8px;color:var(--soft)}
 .promo{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px 32px;align-items:center;background:var(--card);border:2px solid var(--fu);border-radius:24px;padding:24px 28px;margin-bottom:40px}
 .promo h3{font-size:clamp(26px,3.5vw,36px)}
@@ -127,7 +131,7 @@ a{color:inherit}
 .alt{background:var(--card);border-block:1px solid var(--line)}
 .revs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
 .rev{background:var(--bg);border:1px solid var(--line);border-radius:20px;padding:22px;position:relative}
-.rev .s{color:var(--gold);letter-spacing:2px}
+.rev .st{margin-bottom:2px}
 .rev q{display:block;font-size:17px;margin:10px 0 14px;quotes:"“" "”"}
 .rev .a{font-weight:700;font-size:15px}
 .tag{position:absolute;top:14px;right:14px;font-size:13px;background:var(--fu2);color:var(--ink);padding:2px 10px;border-radius:999px}
@@ -164,7 +168,7 @@ footer{text-align:center;font-size:14px;color:var(--soft);padding:28px 16px calc
     <div class="kind"><span data-f="tipo"></span> en <span data-f="ciudad"></span><span class="exp" id="exp"></span></div>
     <h1 data-f="nombre"></h1>
     <p class="lead" data-f="frase"></p>
-    <div class="stars"><b>★★★★★</b><span><span data-f="rating"></span> en Google · <span data-f="totalResenas"></span> reseñas</span></div>
+    <div class="stars"><span class="st" id="st"></span><span><span data-f="rating"></span> en Google · <span data-f="totalResenas"></span> reseñas</span></div>
     <div class="cta"><a class="btn main" href="#cita">Reservar cita</a><a class="btn ghost" href="#servicios">Ver precios</a></div>
   </div>
   <svg class="mirror" viewBox="0 0 400 450" aria-hidden="true">
@@ -251,10 +255,12 @@ footer{text-align:center;font-size:14px;color:var(--soft);padding:28px 16px calc
   const N = NEGOCIO;
   const get = p => p.split('.').reduce((o,k)=>o&&o[k], N);
   const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const stars = n => '<svg class="star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3 6.9 7.5.6-5.7 4.9 1.8 7.3L12 17.8 5.4 21.7l1.8-7.3L1.5 9.5 9 8.9z"/></svg>'.repeat(n);
   const wa = t => 'https://wa.me/' + String(N.whatsapp).replace(/\D/g,'') + '?text=' + encodeURIComponent(t);
 
   if (N.color) document.documentElement.style.setProperty('--fu', N.color);
-  if (N.logo) { const l = document.getElementById('logo'); l.src = N.logo; l.hidden = false; }
+  if (N.logo) { const l = document.getElementById('logo'); l.src = N.logo; l.alt = N.nombre; l.hidden = false; if (N.logoConNombre) l.nextElementSibling.hidden = true; }
+  document.getElementById('st').innerHTML = stars(5);
   if (N.experiencia) document.getElementById('exp').textContent = '· ' + N.experiencia;
   if (N.promo && N.promo.titulo) document.getElementById('promo').hidden = false;
   if (N.botonProblema && N.botonProblema.texto) { const b = document.getElementById('btn-prob'); b.textContent = N.botonProblema.texto; b.href = wa(N.botonProblema.mensaje); b.hidden = false; }
@@ -271,7 +277,7 @@ footer{text-align:center;font-size:14px;color:var(--soft);padding:28px 16px calc
     + labels.slice(Math.min(N.galeria.length,4)).map((l,i) => `<div class="ph" style="background:linear-gradient(160deg,${tones[i]},color-mix(in srgb,${tones[i]} 55%,#000))">${l} · foto de muestra</div>`).join('');
 
   document.getElementById('revs').innerHTML = N.resenas.map(r =>
-    `<figure class="rev" style="margin:0">${r.ejemplo?'<span class="tag">Ejemplo</span>':''}<div class="s">${'★'.repeat(r.estrellas||5)}</div><q>${esc(r.texto)}</q><figcaption class="a">${esc(r.autor)}</figcaption></figure>`).join('');
+    `<figure class="rev" style="margin:0">${r.ejemplo?'<span class="tag">Ejemplo</span>':''}<div class="st">${stars(r.estrellas||5)}</div><q>${esc(r.texto)}</q><figcaption class="a">${esc(r.autor)}</figcaption></figure>`).join('');
 
   const dias = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
   const hoy = dias[new Date().getDay()];
